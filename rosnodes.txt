@@ -237,6 +237,26 @@ catkin_install_python(PROGRAMS scripts/add_two_ints_server.py scripts/add_two_in
 cd ~/catkin_ws
 catkin_make
 
+----------------------------bag and play----------------------------------
+roscore
+rosrun turtlesim turtlesim_node
+rosrun turtlesim turtle_teleop_key
+mkdir ~/bagfiles
+cd ~/bagfiles
+rosbag record -a
+
+rosbag info <your bagfile>
+
+rosbag play <your bagfile>
+
+rosbag play -r 2 <your bagfile>
+
+
+rosrun turtlesim turtlesim_node
+rosrun turtlesim turtle_teleop_key
+rosbag record -O subset /turtle1/cmd_vel /turtle1/pose
+
+
 
 
 
