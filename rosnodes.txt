@@ -1,0 +1,105 @@
+-------------------Node------------------------------
+roscore
+rosnode list
+rosrun turtlesim turtlesim_node
+rosrun turtlesim turtlesim_node __name:=my_turtle
+rosnode ping my_turtle
+
+
+
+-------------------Topics----------------------------
+roscore
+rosrun turtlesim turtlesim_node
+rosrun turtlesim turtle_teleop_key
+
+sudo apt-get install ros-<distro>-rqt
+sudo apt-get install ros-<distro>-rqt-common-plugins
+
+rosrun rqt_graph rqt_graph
+rostopic echo /turtle1/cmd_vel
+rostopic list -v
+
+rostopic type /turtle1/cmd_vel
+rosmsg show geometry_msgs/Twist
+
+rostopic pub [topic] [msg_type] [args]
+rostopic pub -1 /turtle1/cmd_vel geometry_msgs/Twist -- '[2.0, 0.0, 0.0]' '[0.0, 0.0, 1.8]'
+rostopic pub /turtle1/cmd_vel geometry_msgs/Twist -r 1 -- '[2.0, 0.0, 0.0]' '[0.0, 0.0, -1.8]'
+
+rostopic hz /turtle1/pose
+rostopic type /turtle1/cmd_vel | rosmsg show
+
+rosrun rqt_plot rqt_plot
+
+/turtle1/pose/x 
+/turtle1/pose/y
+/turtle1/pose/
+
+
+-------------------------------Services and Parameters------------------------------------
+rosservice list
+rosservice type /clear
+rosservice call /clear
+rosservice type /spawn | rossrv show
+rosservice call /spawn 2 2 0.2 ""
+
+-------------------------------ros parameters-------------------------------------------
+rosparam list
+rosparam set /turtlesim/background_r 150
+rosparam get /turtlesim/background_r
+rosservice call /clear
+
+
+rosparam dump params.yaml
+rosparam load params.yaml copy_turtle
+
+------------------------------rqt------------------------------------------------------
+sudo apt-get install ros-<distro>-rqt ros-<distro>-rqt-common-plugins ros-<distro>-turtlesim
+rosrun rqt_console rqt_console
+rosrun rqt_logger_level rqt_logger_level
+rostopic pub /turtle1/cmd_vel geometry_msgs/Twist -r 1 -- '{linear: {x: 2.0, y: 0.0, z: 0.0}, angular: {x: 0.0,y: 0.0,z: 0.0}}'
+rostopic pub /turtle1/command_velocity turtlesim/Velocity -r 1 -- 2.0  0.0
+
+
+------------------------------roslaunch-----------------------------------------------
+roslaunch [package] [filename.launch]
+cd ~/catkin_ws/src
+catkin_create_pkg <package_name> [depend1] [depend2] [depend3]
+catkin_create_pkg beginner_tutorials std_msgs rospy roscpp
+cd ~/catkin_ws
+catkin_make
+
+rospack depends1 beginner_tutorials 
+rospack depends beginner_tutorials
+
+roscd beginner_tutorials
+cd ~/catkin_ws
+source devel/setup.bash
+roscd beginner_tutorials
+
+mkdir launch
+cd launch
+
+
+touch turtlemimic.launch
+<launch>
+<group ns="turtlesim1">
+  <node pkg="turtlesim" name="sim" type="turtlesim_node"/>
+</group>
+
+<group ns="turtlesim2">
+  <node pkg="turtlesim" name="sim" type="turtlesim_node"/>
+</group>
+ 
+ <node pkg="turtlesim" name="mimic" type="mimic">
+   <remap from="input" to="turtlesim1/turtle1"/>
+   <remap from="output" to="turtlesim2/turtle1"/>
+ </node>
+</launch>
+
+rostopic pub /turtlesim1/turtle1/cmd_vel geometry_msgs/Twist -r 1 -- '[2.0, 0.0, 0.0]' '[0.0, 0.0, -1.8]'
+rqt_graph
+
+
+
+ 
