@@ -100,6 +100,147 @@ touch turtlemimic.launch
 rostopic pub /turtlesim1/turtle1/cmd_vel geometry_msgs/Twist -r 1 -- '[2.0, 0.0, 0.0]' '[0.0, 0.0, -1.8]'
 rqt_graph
 
+--------------------------------------Custom rosmsg and service-------------------------------------------------
+roscd beginner_tutorials
+mkdir msg
+echo "int64 num" > msg/Num.msg
+
+in package.xml
+  <build_depend>message_generation</build_depend>
+  <exec_depend>message_runtime</exec_depend>
+  
+in cmakelists.txt
+find_package(catkin REQUIRED COMPONENTS
+   roscpp
+   rospy
+   std_msgs
+   message_generation
+)
+
+add_message_files(
+  FILES
+  Num.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
+
+
+rosmsg show beginner_tutorials/Num
+rosmsg show Num
+
+
+roscd beginner_tutorials
+mkdir srv
+
+#copy files from one place to another
+roscp [package_name] [file_to_copy_path] [copy_path]
+roscp rospy_tutorials AddTwoInts.srv srv/AddTwoInts.srv
+
+in package.xml
+  <build_depend>message_generation</build_depend>
+  <exec_depend>message_runtime</exec_depend>
+  
+# Do not just add this line to your CMakeLists.txt, modify the existing line
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  rospy
+  std_msgs
+  message_generation
+)
+
+add_service_files(
+  FILES
+  AddTwoInts.srv
+)
+
+
+rossrv show beginner_tutorials/AddTwoInts
+rossrv show AddTwoInts
+
+------------common step for srv and msg--------------------------------
+Cmakelists.txt
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
+
+
+
+roscd beginner_tutorials
+cd ../..
+catkin_make
+cd -
+
+
+
+---------------publisher and subsciber----------------------------------------
+roscd beginner_tutorials
+mkdir scripts
+cd scripts
+wget https://raw.github.com/ros/ros_tutorials/kinetic-devel/rospy_tutorials/001_talker_listener/talker.py
+chmod +x talker.py
+
+changes in cmakelists.txt
+catkin_install_python(PROGRAMS scripts/talker.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+This loop also calls rospy.loginfo(str), which performs triple-duty: the messages get printed to screen, it gets written to the Node's log file, and it gets written to rosout. rosout is a handy tool for debugging: you can pull up messages using rqt_console instead of having to find the console window with your Node's output.
+
+msg = String()
+msg.data = str
+
+
+Subscriber
+roscd beginner_tutorials/scripts/
+wget https://raw.github.com/ros/ros_tutorials/kinetic-devel/rospy_tutorials/001_talker_listener/listener.py
+chmod +x listener.py
+The anonymous=True flag tells rospy to generate a unique name for the node so that you can have multiple listener.py nodes run easily. 
+
+
+
+Cmakelists.txt
+catkin_install_python(PROGRAMS scripts/talker.py scripts/listener.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+
+cd ~/catkin_ws
+catkin_make
+
+roscore
+cd ~/catkin_ws
+rosrun beginner_tutorials talker.py
+rosrun beginner_tutorials listener.py
+
+-----------------------------------------service and request in python scripts---------------------------------------------
+!wget https://raw.githubusercontent.com/kunal15595/ros/master/ros_ws/src/beginner_tutorials/scripts/add_two_ints_server.py
+chmod +x scripts/add_two_ints_server.py
+
+
+changes in  cmakelists.txt
+catkin_install_python(PROGRAMS scripts/add_two_ints_server.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+
+
+!wget https://raw.githubusercontent.com/kunal15595/ros/master/ros_ws/src/beginner_tutorials/scripts/add_two_ints_client.py
+chmod +x scripts/add_two_ints_client.py
+catkin_install_python(PROGRAMS scripts/add_two_ints_server.py scripts/add_two_ints_client.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+cd ~/catkin_ws
+catkin_make
+
+
+
+
+
 
 
  
