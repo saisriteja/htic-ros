@@ -1,0 +1,9 @@
+<launch>
+<node name="turtlesim" pkg="turtlesim" type="turtlesim_node" />
+<node name="turtlesubs" pkg="beginner_tutorials" type="turtlesim_subs.py" />
+</launch>
+
+catkin_install_python(PROGRAMS scripts/talker.py scripts/listener.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
